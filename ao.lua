@@ -50,7 +50,7 @@ Handlers.add(
       message = capsuleData.message,
       unlockDate = msg.Tags["UnlockDate"],
       files = capsuleData.files or {},
-      createdAt = os.time()
+      createdAt = capsuleData.createdAt or os.time() -- Use client-provided createdAt if available
     }
     
     -- Return the capsule ID to the user
@@ -119,10 +119,10 @@ Handlers.add(
     -- Find all capsules owned by the requesting user
     for id, capsule in pairs(TimeCapsules) do
       if capsule.owner == msg.From then
-        -- Fix: Ensure proper comparison for isUnlocked status
         local unlockTime = tonumber(capsule.unlockDate)
-        local isUnlocked = currentTime >= unlockTime
-        
+        local createdAt = tonumber(capsule.createdAt)
+        -- Capsule is unlocked only if current time >= unlock time AND createdAt < unlockTime
+        local isUnlocked = (currentTime >= unlockTime) and (createdAt < unlockTime)
         table.insert(userCapsules, {
           id = capsule.id,
           unlockDate = capsule.unlockDate,

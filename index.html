@@ -237,7 +237,7 @@
     } from 'https://unpkg.com/@ardrive/turbo-sdk/bundles/web.bundle.min.js';
 
     // AO Process ID - replace with your deployed process ID
-    const processId = '<process_id>';
+    const processId = 'yaB0juhlvBWfp1ZwLjTxjt4ICdNNQktFdBM_3G_J-q8';
     
     // Global variables
     let wallet = null;
@@ -255,26 +255,26 @@
     const copyCapsuleLink = document.getElementById('copyCapsuleLink');
     const errorCloseBtn = document.getElementById('errorCloseBtn');
     
-    // Helper function to format dates properly
+    // Helper function to format dates properly - FIXED VERSION
     function formatDate(timestamp) {
-      // Make sure timestamp is a number
-      const ts = parseInt(timestamp);
+      // Convert timestamp to a number if it's a string
+      const ts = typeof timestamp === 'string' ? parseInt(timestamp) : timestamp;
+      
+      // If timestamp is invalid, return a placeholder
       if (isNaN(ts)) {
+        return 'Unknown date';
+      }
+      
+      // Create a date object - handle both seconds and milliseconds formats
+      const date = ts < 10000000000 ? new Date(ts * 1000) : new Date(ts);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
         return 'Invalid date';
       }
       
-      // Create a date object from the timestamp (in seconds)
-      const date = new Date(ts * 1000);
-      
       // Format the date
-      return date.toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      }) + ' ' + date.toLocaleTimeString(undefined, {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return date.toLocaleString();
     }
     
     // Helper function to format file sizes
@@ -670,7 +670,7 @@
           await connectWallet();
         }
         
-        // Then display the capsule
+        //Then display the capsule
         await displayCapsule(capsuleId);
       } catch (error) {
         console.error('Error loading capsule from URL:', error);
@@ -830,7 +830,6 @@
           capsulesList.innerHTML = '<p class="text-gray-500 text-center py-4">You haven\'t created any time capsules yet.</p>';
         } else {
           response.capsules.forEach(capsule => {
-            // Fix date formatting using our helper function
             const createdDate = formatDate(capsule.createdAt);
             const unlockDate = formatDate(capsule.unlockDate);
             
