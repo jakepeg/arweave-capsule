@@ -50,7 +50,7 @@ Handlers.add(
       message = capsuleData.message,
       unlockDate = msg.Tags["UnlockDate"],
       files = capsuleData.files or {},
-      createdAt = capsuleData.createdAt or os.time() -- Use client-provided createdAt if available
+      createdAt = tostring(os.time())
     }
     
     -- Return the capsule ID to the user
@@ -73,12 +73,19 @@ Handlers.add(
     end
     
     local capsule = TimeCapsules[capsuleId]
-    local currentTime = os.time()
+    local currentTime = tonumber(os.time())
     local unlockTime = tonumber(capsule.unlockDate)
+    local createdAt = tonumber(capsule.createdAt)
     
-    -- Fix: Ensure proper comparison of timestamps
-    -- Check if the capsule is unlocked (current time must be >= unlock time)
-    local isUnlocked = currentTime >= unlockTime
+    -- Debug output
+    print("Current time: " .. currentTime)
+    print("Unlock time: " .. unlockTime)
+    print("Created at: " .. createdAt)
+    
+    -- Capsule is unlocked only if current time >= unlock time AND createdAt < unlockTime
+    local isUnlocked = (currentTime >= unlockTime) and (createdAt < unlockTime)
+    
+    print("Is unlocked: " .. tostring(isUnlocked))
     
     -- If not unlocked, only return metadata
     if not isUnlocked then
@@ -114,15 +121,17 @@ Handlers.add(
   Handlers.utils.hasMatchingTag("Action", "ListCapsules"),
   function(msg)
     local userCapsules = {}
-    local currentTime = os.time()
+    local currentTime = tonumber(os.time())
     
     -- Find all capsules owned by the requesting user
     for id, capsule in pairs(TimeCapsules) do
       if capsule.owner == msg.From then
         local unlockTime = tonumber(capsule.unlockDate)
         local createdAt = tonumber(capsule.createdAt)
+        
         -- Capsule is unlocked only if current time >= unlock time AND createdAt < unlockTime
         local isUnlocked = (currentTime >= unlockTime) and (createdAt < unlockTime)
+        
         table.insert(userCapsules, {
           id = capsule.id,
           unlockDate = capsule.unlockDate,
