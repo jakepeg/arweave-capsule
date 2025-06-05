@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blockchain Time Capsule</title>
+  <!-- Load Tailwind CSS from CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Flatpickr CSS and JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+    .time-capsule-container {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      border: 1px solid #e5e7eb;
+    }
+    .countdown-container {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    }
+    .countdown-number {
+      background-color: #1e40af;
+      color: white;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      font-size: 1.5rem;
+      min-width: 3.5rem;
+      text-align: center;
+    }
+    .countdown-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #1e40af;
+      font-weight: 600;
+    }
+    .file-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-indigo-600">Blockchain Time Capsule</h1>
+        <button id="connectWalletBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+          Connect Wallet
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-8">
+      <!-- Create Capsule Section -->
+      <div id="createSection" class="time-capsule-container rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Create a New Time Capsule</h2>
+        
+        <div class="mb-4">
+          <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Your Message (max 200 characters)</label>
+          <textarea id="message" maxlength="200" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Write a message to your future self..." rows="3"></textarea>
+          <div class="text-xs text-right text-gray-500 mt-1">
+            <span id="charCount">0</span>/200 characters
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="releaseDate" class="block text-sm font-medium text-gray-700 mb-1">Release Date</label>
+          <input type="text" id="releaseDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Select a future date...">
+        </div>
+        
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Upload Files</label>
+          <div class="flex items-center justify-center w-full">
+            <label for="fileUpload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg class="w-8 h-8 mb-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                <p class="text-xs text-gray-500">Upload any files to include in your time capsule</p>
+              </div>
+              <input id="fileUpload" type="file" class="hidden" multiple="">
+            </label>
+          </div>
+          
+          <div id="fileList" class="mt-4 file-list">
+            <!-- File list will be populated here -->
+          </div>
+        </div>
+        
+        <div class="flex justify-end">
+          <button id="createCapsuleBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+            Create Time Capsule
+          </button>
+        </div>
+      </div>
+      
+      <!-- View Capsule Section -->
+      <div id="viewSection" class="time-capsule-container rounded-xl shadow-md p-6 mb-8 hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold">Time Capsule</h2>
+          <div class="flex space-x-4">
+            <button id="viewMyCapsules" class="text-indigo-600 hover:text-indigo-800">My Capsules</button>
+            <button id="backToCreateBtn" class="text-indigo-600 hover:text-indigo-800">← Create another capsule</button>
+          </div>
+        </div>
+
+        <p class="text-sm text-gray-500 mb-4">Capsule ID: <span id="capsuleIdDisplay" class="font-mono"></span></p>
+
+        <!-- Countdown Display -->
+        <div id="countdownContainer" class="countdown-container rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-center text-indigo-900 mb-4">Time Until Unlock</h3>
+          <div class="grid grid-cols-4 gap-4">
+            <div class="flex flex-col items-center">
+              <div id="days" class="countdown-number">00</div>
+              <div class="countdown-label">Days</div>
+            </div>
+            <div class="flex flex-col items-center">
+              <div id="hours" class="countdown-number">00</div>
+              <div class="countdown-label">Hours</div>
+            </div>
+            <div class="flex flex-col items-center">
+              <div id="minutes" class="countdown-number">00</div>
+              <div class="countdown-label">Minutes</div>
+            </div>
+            <div class="flex flex-col items-center">
+              <div id="seconds" class="countdown-number">00</div>
+              <div class="countdown-label">Seconds</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capsule Content (Hidden until unlocked) -->
+        <div id="capsuleContent" class="hidden">
+          <div class="bg-white rounded-lg p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">Message</h3>
+            <p id="capsuleMessage" class="text-gray-700 whitespace-pre-wrap"></p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Files</h3>
+            <div id="capsuleFiles" class="space-y-3">
+              <!-- Files will be listed here -->
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+          <button id="copyCapsuleLink" class="text-indigo-600 hover:text-indigo-800">
+            Copy Shareable Link
+          </button>
+        </div>
+      </div>
+
+      <!-- My Capsules List Section -->
+      <div id="myCapsulesList" class="time-capsule-container rounded-xl shadow-md p-6 mb-8 hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold">My Time Capsules</h2>
+          <button id="backFromListBtn" class="text-indigo-600 hover:text-indigo-800">← Back</button>
+        </div>
+        <div id="capsulesList" class="space-y-4">
+          <!-- Capsules will be listed here -->
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-4">
+      <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
+        <p class="text-sm text-gray-600">
+          Built with <a href="https://cookbook_ao.arweave.net/" class="text-indigo-600 hover:underline" target="_blank">AO</a> and <a href="https://www.arweave.org/" class="text-indigo-600 hover:underline" target="_blank">Arweave</a>
+        </p>
+        <a href="https://v3i4cnpp7gr3ruxco76b6qhvhor5jmvp2ru57s65htm673wwx2ha.arweave.net/rtHBNe_5o7jS4nf8H0D1O6PUsq_Uad_L3TzZ7-7Wvo4" class="text-sm text-indigo-600 hover:underline" target="_blank">
+          Original Inspiration
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+      <div class="flex items-center justify-center mb-4">
+        <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      <p id="loadingText" class="text-center text-gray-700">Processing your time capsule...</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div id="errorMessage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+      <div class="flex items-center justify-center mb-4 text-red-500">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <p id="errorText" class="text-center text-gray-700 mb-4">An error occurred.</p>
+      <div class="flex justify-center">
+        <button id="errorCloseBtn" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import required libraries
+    import {
+      message,
+      result,
+      dryrun,
+      createDataItemSigner
+    } from 'https://unpkg.com/@permaweb/aoconnect/dist/browser.js';
+    
+    import {
+      TurboFactory,
+      ArconnectSigner,
+    } from 'https://unpkg.com/@ardrive/turbo-sdk/bundles/web.bundle.min.js';
+
+    // AO Process ID - replace with your deployed process ID
+    const processId = 'WNatBaFhqr43oisN2xcui1yONMGC9ihLj3tDN5f19DU';
+    
+    // Global variables
+    let wallet = null;
+    let signer = null;
+    let turbo = null;
+    let currentCapsuleId = null;
+    let countdownInterval = null;
+    
+    // DOM elements
+    const connectWalletBtn = document.getElementById('connectWalletBtn');
+    const createCapsuleBtn = document.getElementById('createCapsuleBtn');
+    const viewMyCapsules = document.getElementById('viewMyCapsules');
+    const backToCreateBtn = document.getElementById('backToCreateBtn');
+    const backFromListBtn = document.getElementById('backFromListBtn');
+    const copyCapsuleLink = document.getElementById('copyCapsuleLink');
+    const errorCloseBtn = document.getElementById('errorCloseBtn');
+    
+    // Helper function to format dates properly - FIXED VERSION
+    function formatDate(timestamp) {
+      // Convert timestamp to a number if it's a string
+      const ts = typeof timestamp === 'string' ? parseInt(timestamp) : timestamp;
+      
+      // If timestamp is invalid, return a placeholder
+      if (isNaN(ts)) {
+        return 'Unknown date';
+      }
+      
+      // Create a date object - handle both seconds and milliseconds formats
+      const date = ts < 10000000000 ? new Date(ts * 1000) : new Date(ts);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      
+      // Format the date
+      return date.toLocaleString();
+    }
+    
+    // Helper function to format file sizes
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      else return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+    
+    // Helper function to show a section and hide others
+    function showSection(sectionId) {
+      document.getElementById('createSection').classList.add('hidden');
+      document.getElementById('viewSection').classList.add('hidden');
+      document.getElementById('myCapsulesList').classList.add('hidden');
+      document.getElementById(sectionId).classList.remove('hidden');
+      // UI logic for Option 1
+      // Hide "My Capsules" if not connected
+      if (sectionId === 'viewSection') {
+        if (!wallet) {
+          document.getElementById('viewMyCapsules').classList.add('hidden');
+          document.getElementById('backToCreateBtn').textContent = '← Create a Time Capsule';
+        } else {
+          document.getElementById('viewMyCapsules').classList.remove('hidden');
+          document.getElementById('backToCreateBtn').textContent = '← Create another capsule';
+        }
+      }
+    }
+    
+    // Helper function to show loading overlay
+    function showLoading(message) {
+      document.getElementById('loadingText').textContent = message || 'Loading...';
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+    }
+    
+    // Helper function to hide loading overlay
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+    
+    // Helper function to show error message
+    function showError(message) {
+      document.getElementById('errorText').textContent = message;
+      document.getElementById('errorMessage').classList.remove('hidden');
+    }
+    
+    // Update countdown timer
+    function updateCountdown(unlockTime) {
+      const now = new Date().getTime();
+      const distance = unlockTime - now;
+      
+      // If the countdown is over
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        // Reload the capsule to show content
+        displayCapsule(currentCapsuleId);
+        return;
+      }
+      
+      // Calculate time units
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      // Update the countdown display
+      document.getElementById('days').textContent = days.toString().padStart(2, '0');
+      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+      document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    }
+    
+    // Update file list UI
+    function updateFileList(files) {
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = '';
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileItem = document.createElement('div');
+        fileItem.className = 'flex items-center justify-between p-2 bg-white rounded border border-gray-200';
+        fileItem.innerHTML = `
+          <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span class="text-sm truncate max-w-xs">${file.name}</span>
+            <span class="text-xs text-gray-500 ml-2">(${formatFileSize(file.size)})</span>
+          </div>
+          <button class="remove-file text-red-500 hover:text-red-700" data-index="${i}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        `;
+        fileList.appendChild(fileItem);
+        
+        // Add remove button event listener
+        fileItem.querySelector('.remove-file').addEventListener('click', (e) => {
+          const index = parseInt(e.currentTarget.getAttribute('data-index'));
+          removeFileFromList(index);
+        });
+      }
+    }
+    
+    // Remove file from list
+    function removeFileFromList(index) {
+      const fileUpload = document.getElementById('fileUpload');
+      const dt = new DataTransfer();
+      const files = fileUpload.files;
+      
+      for (let i = 0; i < files.length; i++) {
+        if (i !== index) {
+          dt.items.add(files[i]);
+        }
+      }
+      
+      fileUpload.files = dt.files;
+      updateFileList(fileUpload.files);
+    }
+    
+    // Initialize date picker when the document is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize flatpickr date picker
+      flatpickr("#releaseDate", {
+        enableTime: true,
+        minDate: "today",
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true
+      });
+      
+      // Character counter for message
+      const messageInput = document.getElementById('message');
+      const charCount = document.getElementById('charCount');
+      
+      messageInput.addEventListener('input', () => {
+        const count = messageInput.value.length;
+        charCount.textContent = count;
+      });
+      
+      // File upload handling
+      const fileUpload = document.getElementById('fileUpload');
+      
+      fileUpload.addEventListener('change', () => {
+        const files = fileUpload.files;
+        if (files.length > 0) {
+          updateFileList(files);
+        }
+      });
+      
+      // Check URL for capsule ID - safely handle this to avoid the pushState error
+      try {
+        if (window.location.href.includes('?id=')) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const capsuleIdFromUrl = urlParams.get('id');
+          
+          if (capsuleIdFromUrl) {
+            // If there's a capsule ID in the URL, try to load it
+            loadCapsuleFromUrl(capsuleIdFromUrl);
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing URL parameters:', error);
+      }
+      
+      // Restore wallet state if present
+      const savedWallet = localStorage.getItem('arconnect_wallet');
+      if (savedWallet) {
+        wallet = savedWallet;
+        // Recreate signer and turbo if wallet is present
+        if (window.arweaveWallet) {
+          signer = createDataItemSigner(window.arweaveWallet);
+          const turboSigner = new ArconnectSigner(window.arweaveWallet);
+          turbo = TurboFactory.authenticated({ signer: turboSigner });
+        }
+        updateWalletUI(wallet);
+      }
+      
+      // Disable create button until wallet is connected
+      const createBtn = document.getElementById('createCapsuleBtn');
+      if (createBtn) {
+        createBtn.addEventListener('click', createCapsule);
+        // Optionally, disable until wallet is connected
+        createBtn.disabled = !wallet;
+      }
+      
+      // Set up event listeners
+      setupEventListeners();
+    });
+    
+    // Set up event listeners
+    function setupEventListeners() {
+      // Connect wallet button
+      connectWalletBtn.addEventListener('click', connectWallet);
+      
+      // Create capsule button
+      createCapsuleBtn.addEventListener('click', createCapsule);
+      
+      // View my capsules button
+      viewMyCapsules.addEventListener('click', listMyCapsules);
+      
+      // Back buttons
+      backToCreateBtn.addEventListener('click', () => {
+        showSection('createSection');
+      });
+      
+      backFromListBtn.addEventListener('click', () => {
+        showSection('createSection');
+      });
+      
+      // Copy capsule link button
+      copyCapsuleLink.addEventListener('click', () => {
+        try {
+          let shareableUrl;
+          if (window.location.href.includes('about:srcdoc') || window.location.href.includes('about:blank')) {
+            shareableUrl = `Capsule ID: ${currentCapsuleId}`;
+          } else {
+            // Always use view.html for the shareable link
+            const url = new URL(window.location.href);
+            url.pathname = url.pathname.replace(/index\.html$/, 'view.html');
+            if (!url.pathname.endsWith('view.html')) url.pathname = 'view.html';
+            url.search = `?id=${currentCapsuleId}`;
+            shareableUrl = url.toString();
+          }
+          navigator.clipboard.writeText(shareableUrl)
+            .then(() => {
+              copyCapsuleLink.textContent = 'Link Copied!';
+              setTimeout(() => {
+                copyCapsuleLink.textContent = 'Copy Shareable Link';
+              }, 2000);
+            })
+            .catch(err => {
+              showError('Failed to copy link: ' + err.message);
+            });
+        } catch (error) {
+          console.error('Error copying link:', error);
+          showError('Failed to copy link: ' + error.message);
+        }
+      });
+      
+      // Error close button
+      errorCloseBtn.addEventListener('click', () => {
+        document.getElementById('errorMessage').classList.add('hidden');
+      });
+    }
+    
+    // Connect wallet function
+    async function connectWallet() {
+      try {
+        if (typeof window.arweaveWallet === 'undefined') {
+          showError("ArConnect wallet extension not found. Please install it from https://www.arconnect.io");
+          return;
+        }
+        
+        showLoading('Connecting to wallet...');
+        
+        // Request connection permissions
+        await window.arweaveWallet.connect([
+          'ACCESS_ADDRESS',
+          'SIGN_TRANSACTION',
+          'ACCESS_PUBLIC_KEY',
+          'SIGNATURE'
+        ]);
+        
+        // Get wallet address
+        wallet = await window.arweaveWallet.getActiveAddress();
+        localStorage.setItem('arconnect_wallet', wallet); // Persist wallet
+        signer = createDataItemSigner(window.arweaveWallet);
+        const turboSigner = new ArconnectSigner(window.arweaveWallet);
+        turbo = TurboFactory.authenticated({ signer: turboSigner });
+        
+        // Update UI
+        updateWalletUI(wallet);
+        
+        hideLoading();
+      } catch (error) {
+        console.error('Error connecting wallet:', error);
+        hideLoading();
+        showError('Failed to connect wallet: ' + (error.message || 'Unknown error'));
+      }
+    }
+    
+    function updateWalletUI(walletAddr) {
+      const btn = document.getElementById('connectWalletBtn');
+      const createBtn = document.getElementById('createCapsuleBtn');
+      if (btn && walletAddr) {
+        btn.textContent = walletAddr.slice(0, 6) + '...' + walletAddr.slice(-4);
+        btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        btn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
+        if (createBtn) createBtn.disabled = false;
+      } else {
+        if (createBtn) createBtn.disabled = true;
+      }
+    }
+    
+    // Create a new time capsule
+    async function createCapsule() {
+      if (!wallet) {
+        showError('Please connect your wallet first.');
+        return;
+      }
+      if (!turbo) {
+        showError('Wallet not fully connected. Please connect your wallet again.');
+        return;
+      }
+      
+      const messageInput = document.getElementById('message');
+      const releaseDateInput = document.getElementById('releaseDate');
+      const fileUpload = document.getElementById('fileUpload');
+      
+      // Validate inputs
+      if (!messageInput.value.trim()) {
+        showError('Please enter a message for your time capsule.');
+        return;
+      }
+      
+      if (!releaseDateInput.value) {
+        showError('Please select a release date for your time capsule.');
+        return;
+      }
+      
+      const releaseDate = new Date(releaseDateInput.value);
+      if (isNaN(releaseDate.getTime()) || releaseDate <= new Date()) {
+        showError('Please select a valid future date.');
+        return;
+      }
+      
+      try {
+        showLoading('Uploading files to Arweave...');
+        
+        // Upload files to Arweave using ArDrive Turbo
+        const files = fileUpload.files;
+        const fileInfos = [];
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          
+          // Upload file to Arweave
+          const uploadResult = await turbo.uploadFile({
+            fileStreamFactory: () => file.stream(),
+            fileSizeFactory: () => file.size,
+            dataItemOpts: {
+              tags: [{ name: "Content-Type", value: file.type }]
+            }
+          });
+          
+          // Store file info
+          fileInfos.push({
+            id: uploadResult.id,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            url: `https://arweave.net/${uploadResult.id}`
+          });
+        }
+        
+        showLoading('Creating time capsule on AO...');
+        
+        // Prepare capsule data
+        const capsuleData = {
+          message: messageInput.value,
+          files: fileInfos
+        };
+        
+        // Convert release date to Unix timestamp
+        const unlockTimestamp = Math.floor(releaseDate.getTime() / 1000);
+        
+        console.log("Setting unlock timestamp:", unlockTimestamp, "Current time:", Math.floor(Date.now() / 1000));
+        
+        // Send message to AO process to create the capsule
+        const res = await message({
+          process: processId,
+          signer,
+          tags: [
+            { name: 'Action', value: 'CreateCapsule' },
+            { name: 'UnlockDate', value: unlockTimestamp.toString() }
+          ],
+          data: JSON.stringify(capsuleData)
+        });
+        
+        // Get the result
+        const { Messages } = await result({ process: processId, message: res });
+        
+        if (Messages.length === 0) {
+          throw new Error('No response from AO process');
+        }
+        
+        const response = JSON.parse(Messages[0].Data);
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to create time capsule');
+        }
+        
+        // Store the capsule ID
+        currentCapsuleId = response.capsuleId;
+        
+        // Safely update URL if possible
+        try {
+          if (!window.location.href.includes('about:srcdoc') && !window.location.href.includes('about:blank')) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('id', currentCapsuleId);
+            // Use replaceState instead of pushState to avoid navigation issues
+            window.history.replaceState({}, '', url);
+          }
+        } catch (error) {
+          console.error('Error updating URL:', error);
+          // Continue without updating URL
+        }
+        
+        // Display the capsule
+        await displayCapsule(currentCapsuleId);
+        
+        // Reset form
+        messageInput.value = '';
+        releaseDateInput.value = '';
+        fileUpload.value = '';
+        document.getElementById('fileList').innerHTML = '';
+        document.getElementById('charCount').textContent = '0';
+        
+        hideLoading();
+      } catch (error) {
+        console.error('Error creating time capsule:', error);
+        hideLoading();
+        showError('Failed to create time capsule: ' + (error.message || 'Unknown error'));
+      }
+    }
+    
+    // Load a capsule from URL parameter
+    async function loadCapsuleFromUrl(capsuleId) {
+      try {
+        // For public viewing, do not require wallet connection
+        await displayCapsule(capsuleId);
+      } catch (error) {
+        console.error('Error loading capsule from URL:', error);
+        showError('Failed to load time capsule: ' + (error.message || 'Unknown error'));
+      }
+    }
+    
+    // Display a time capsule
+    async function displayCapsule(capsuleId) {
+      try {
+        showLoading('Loading time capsule...');
+        currentCapsuleId = capsuleId;
+        const capsuleIdDisplay = document.getElementById('capsuleIdDisplay');
+        if (capsuleIdDisplay) capsuleIdDisplay.textContent = capsuleId;
+        // Build message params, omitting signer if not connected
+        const msgParams = {
+          process: processId,
+          tags: [
+            { name: 'Action', value: 'GetCapsule' },
+            { name: 'CapsuleId', value: capsuleId }
+          ]
+        };
+        // Only include signer if it is a function or an object with a sign method
+        if (typeof signer === 'function' || (signer && typeof signer.sign === 'function')) {
+          msgParams.signer = signer;
+        }
+        const res = await message(msgParams);
+        
+        // Get the result
+        const { Messages } = await result({ process: processId, message: res });
+        
+        if (Messages.length === 0) {
+          throw new Error('No response from AO process');
+        }
+        
+        const response = JSON.parse(Messages[0].Data);
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to load time capsule');
+        }
+        
+        const capsule = response.capsule;
+        
+        // Show the view section
+        showSection('viewSection');
+        
+        // Clear any existing countdown interval
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+        }
+        
+        // Debug log to check unlock status and timestamps
+        console.log("Capsule unlock status:", capsule.isUnlocked);
+        console.log("Unlock date:", capsule.unlockDate);
+        console.log("Current time:", Math.floor(Date.now() / 1000));
+        
+        // Check if capsule is unlocked
+        if (capsule.isUnlocked) {
+          // Show capsule content
+          const countdownContainer = document.getElementById('countdownContainer');
+          if (countdownContainer) countdownContainer.classList.add('hidden');
+          const capsuleContent = document.getElementById('capsuleContent');
+          if (capsuleContent) capsuleContent.classList.remove('hidden');
+          // Display message
+          const capsuleMessage = document.getElementById('capsuleMessage');
+          if (capsuleMessage) capsuleMessage.textContent = capsule.message;
+          // Display files
+          const filesContainer = document.getElementById('capsuleFiles');
+          if (filesContainer) {
+            filesContainer.innerHTML = '';
+            if (capsule.files && capsule.files.length > 0) {
+              capsule.files.forEach(file => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200';
+                fileElement.innerHTML = `
+                  <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span class="text-sm truncate max-w-xs">${file.name}</span>
+                    <span class="text-xs text-gray-500 ml-2">(${formatFileSize(file.size)})</span>
+                  </div>
+                  <a href="${file.url}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    Download
+                  </a>
+                `;
+                filesContainer.appendChild(fileElement);
+              });
+            } else {
+              filesContainer.innerHTML = '<p class="text-gray-500">No files in this time capsule.</p>';
+            }
+          }
+        } else {
+          // Show countdown
+          const countdownContainer = document.getElementById('countdownContainer');
+          if (countdownContainer) countdownContainer.classList.remove('hidden');
+          const capsuleContent = document.getElementById('capsuleContent');
+          if (capsuleContent) capsuleContent.classList.add('hidden');
+          
+          // Set up countdown
+          const unlockTime = parseInt(capsule.unlockDate) * 1000; // Convert to milliseconds
+          updateCountdown(unlockTime);
+          
+          // Update countdown every second
+          countdownInterval = setInterval(() => {
+            updateCountdown(unlockTime);
+          }, 1000);
+        }
+        
+        hideLoading();
+      } catch (error) {
+        console.error('Error displaying capsule:', error);
+        hideLoading();
+        showError('Failed to display time capsule: ' + (error.message || 'Unknown error'));
+      }
+    }
+    
+    // List user's capsules
+    async function listMyCapsules() {
+      try {
+        // Check if wallet is connected
+        if (!wallet) {
+          showError('Please connect your wallet first.');
+          return;
+        }
+        
+        showLoading('Loading your time capsules...');
+        
+        // Get user's capsules from AO process
+        const res = await message({
+          process: processId,
+          signer,
+          tags: [{ name: 'Action', value: 'ListCapsules' }]
+        });
+        
+        // Get the result
+        const { Messages } = await result({ process: processId, message: res });
+        
+        if (Messages.length === 0) {
+          throw new Error('No response from AO process');
+        }
+        
+        const response = JSON.parse(Messages[0].Data);
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to list time capsules');
+        }
+        
+        // Display capsules
+        const capsulesList = document.getElementById('capsulesList');
+        capsulesList.innerHTML = '';
+        
+        if (response.capsules.length === 0) {
+          capsulesList.innerHTML = '<p class="text-gray-500 text-center py-4">You haven\'t created any time capsules yet.</p>';
+        } else {
+          response.capsules.forEach(capsule => {
+            const createdDate = formatDate(capsule.createdAt);
+            const unlockDate = formatDate(capsule.unlockDate);
+            
+            const capsuleElement = document.createElement('div');
+            capsuleElement.className = 'bg-white rounded-lg p-4 border border-gray-200';
+            capsuleElement.innerHTML = `
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-xs text-gray-500">Created: ${createdDate}</p>
+                  <p class="text-xs text-gray-500">Unlocks: ${unlockDate}</p>
+                  <p class="text-xs font-mono text-gray-500 mt-1 truncate">${capsule.id}</p>
+                </div>
+                <div class="flex items-center">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    capsule.isUnlocked 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }">
+                    ${capsule.isUnlocked ? 'Unlocked' : 'Locked'}
+                  </span>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button class="view-capsule-btn text-indigo-600 hover:text-indigo-800 text-sm font-medium" data-id="${capsule.id}">
+                  View Capsule
+                </button>
+              </div>
+            `;
+            capsulesList.appendChild(capsuleElement);
+            
+            // Add event listener to view button
+            capsuleElement.querySelector('.view-capsule-btn').addEventListener('click', (e) => {
+              const capsuleId = e.target.getAttribute('data-id');
+              displayCapsule(capsuleId);
+            });
+          });
+        }
+        
+        // Show the capsules list section
+        showSection('myCapsulesList');
+        
+        hideLoading();
+      } catch (error) {
+        console.error('Error listing capsules:', error);
+        hideLoading();
+        showError('Failed to list time capsules: ' + (error.message || 'Unknown error'));
+      }
+    }
+  </script>
+</body>
+</html>
