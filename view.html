@@ -39,52 +39,14 @@
 <body>
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-white shadow-md">
-      <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
-        <div class="flex items-center">
-          <a href="index.html" class="text-2xl font-bold text-indigo-600">Time Capsule</a>
-        </div>
-        <div class="hidden md:flex space-x-8">
-          <a href="index.html" class="text-gray-700 hover:text-indigo-600">Home</a>
-          <a href="about.html" class="text-gray-700 hover:text-indigo-600">About</a>
-          <a href="create.html" class="text-gray-700 hover:text-indigo-600">Create</a>
-          <a href="view.html" class="text-gray-700 hover:text-indigo-600">View</a>
-        </div>
-        <div class="hidden md:block">
-          <a href="create.html" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-all duration-200">Get Started</a>
-        </div>
-        <div class="md:hidden">
-          <button id="mobileMenuButton" class="text-gray-500 hover:text-gray-700 focus:outline-none">
-            ☰  <!-- Replace SVG with simple hamburger menu text -->
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="md:hidden">
-      <div class="px-4 py-2 bg-white shadow-md">
-        <a href="index.html" class="block text-gray-700 hover:text-indigo-600 py-2">Home</a>
-        <a href="about.html" class="block text-gray-700 hover:text-indigo-600 py-2">About</a>
-        <a href="create.html" class="block text-gray-700 hover:text-indigo-600 py-2">Create</a>
-        <a href="view.html" class="block text-gray-700 hover:text-indigo-600 py-2">View</a>
-      </div>
-    </div>
-
-    <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-20">
-      <div class="max-w-6xl mx-auto px-4 text-center">
-        <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight mb-4">
-          Your Digital Time Capsule Awaits
-        </h1>
-        <p class="text-lg sm:text-xl mb-8">
-          Securely store and share your memories, messages, and files for the future.
-        </p>
-        <a href="create.html" class="bg-white text-indigo-600 hover:bg-gray-100 px-6 py-3 rounded-full font-semibold transition-all duration-200">
-          Create Your Capsule
+    <header class="bg-white shadow-sm">
+      <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-indigo-600">Blockchain Time Capsule</h1>
+        <a href="create.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+          Create Capsule
         </a>
       </div>
-    </div>
+    </header>
 
     <!-- Main Content -->
     <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-8">
@@ -308,11 +270,6 @@
           showError('Failed to display time capsule: ' + (error.message || 'Unknown error'));
         }
       }
-
-      // Initialize mobile menu functionality
-      document.getElementById('mobileMenuButton')?.addEventListener('click', () => {
-        document.getElementById('mobileMenu').classList.toggle('hidden');
-      });
 
       document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
