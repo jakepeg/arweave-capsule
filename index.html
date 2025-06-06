@@ -83,7 +83,7 @@
         <img src="keyring.png" alt="Kapsule Keepsake" class="mx-auto mb-6 w-64" />
         <h2 class="text-3xl font-bold mb-4">Gift a physical memory</h2>
         <p class="text-xl md:text-2xl text-[#BBBBBB] mb-6">
-          Order a custom-engraved keepsake with a scannable QR linking to your capsule.
+          Order a custom-engraved keepsake with a QR code that links to your capsule.
         </p>
       </div>
     </section>
@@ -168,12 +168,12 @@ function updateWalletUI(walletAddr) {
   btns.forEach(btn => {
     if (btn && walletAddr) {
       btn.textContent = walletAddr.slice(0, 6) + '...' + walletAddr.slice(-4);
-      if (btn.classList) {
-        btn.classList.remove('bg-[#00E0B8]', 'hover:bg-[#00C2A0]');
-        btn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
-      } else {
-        console.warn('updateWalletUI: Button found but has no classList:', btn);
-      }
+      // if (btn.classList) {
+      //   btn.classList.remove('bg-[#00E0B8]', 'hover:bg-[#00C2A0]');
+      //   btn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
+      // } else {
+      //   console.warn('updateWalletUI: Button found but has no classList:', btn);
+      // }
     } else if (!btn) {
       console.warn('updateWalletUI: Button not found in DOM');
     }

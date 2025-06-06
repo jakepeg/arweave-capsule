@@ -17,15 +17,22 @@
   <div class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="flex justify-between items-center px-6 py-4">
-      <a href="index.html" class="flex items-center space-x-2">
-        <img src="logo.png" alt="Kapsule logo" class="w-6" />
-        <span class="text-xl font-semibold">Kapsule</span>
-      </a>
-      <button id="connectWalletBtn" class="bg-[#00E0B8] text-black py-3 px-6 rounded-full font-semibold hover:bg-[#00C2A0] transition">
-        Connect Wallet
-      </button>
-    </header>
+<header class="flex justify-between items-center px-6 py-4">
+  <!-- Left: Logo -->
+  <a href="index.html" class="flex items-center space-x-2">
+    <img src="logo.png" alt="Kapsule logo" class="w-6" />
+    <span class="text-xl font-semibold">Kapsule</span>
+  </a>
+
+  <!-- Right: Buttons grouped together -->
+  <div class="flex items-center space-x-4">
+    <button id="viewCapsulesHeader" class="text-[#00E0B8] hover:underline">My Capsules</button>
+    <button id="connectWalletBtn" class="bg-[#00E0B8] text-black py-3 px-6 rounded-full font-semibold hover:bg-[#00C2A0] transition">
+      Connect Wallet
+    </button>
+  </div>
+</header>
+
 
 <main class="flex-grow max-w-3xl mx-auto w-full px-4 py-8">
   <!-- Create Capsule Section -->
@@ -210,6 +217,7 @@
     const connectWalletBtn = document.getElementById('connectWalletBtn');
     const createCapsuleBtn = document.getElementById('createCapsuleBtn');
     const viewMyCapsules = document.getElementById('viewMyCapsules');
+    const viewCapsulesHeader = document.getElementById('viewCapsulesHeader');
     const backToCreateBtn = document.getElementById('backToCreateBtn');
     const backFromListBtn = document.getElementById('backFromListBtn');
     const copyCapsuleLink = document.getElementById('copyCapsuleLink');
@@ -252,15 +260,23 @@
       document.getElementById(sectionId).classList.remove('hidden');
       // UI logic for Option 1
       // Hide "My Capsules" if not connected
-      if (sectionId === 'viewSection') {
+
+
+      // if (sectionId === 'viewSection') {
+
+
+// hide my capsules button when wallet not connected
+
         if (!wallet) {
           document.getElementById('viewMyCapsules').classList.add('hidden');
+          document.getElementById('viewCapsulesHeader').classList.add('hidden');
           document.getElementById('backToCreateBtn').textContent = '← Create a Time Capsule';
         } else {
           document.getElementById('viewMyCapsules').classList.remove('hidden');
+          document.getElementById('viewCapsulesHeader').classList.remove('hidden');
           document.getElementById('backToCreateBtn').textContent = '← Create another capsule';
         }
-      }
+
     }
     
     // Helper function to show loading overlay
@@ -434,6 +450,7 @@
       
       // View my capsules button
       viewMyCapsules.addEventListener('click', listMyCapsules);
+      viewCapsulesHeader.addEventListener('click', listMyCapsules);
       
       // Back buttons
       backToCreateBtn.addEventListener('click', () => {
@@ -521,8 +538,8 @@
       const createBtn = document.getElementById('createCapsuleBtn');
       if (btn && walletAddr) {
         btn.textContent = walletAddr.slice(0, 6) + '...' + walletAddr.slice(-4);
-        btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
-        btn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
+        // btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        // btn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
         if (createBtn) createBtn.disabled = false;
       } else {
         if (createBtn) createBtn.disabled = true;
