@@ -3,215 +3,184 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blockchain Time Capsule</title>
-  <!-- Load Tailwind CSS from CDN -->
+  <title>Kapsule</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Load Flatpickr CSS and JS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f9fafb;
-      color: #1f2937;
-    }
-    .time-capsule-container {
-      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-      border: 1px solid #e5e7eb;
-    }
-    .countdown-container {
-      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    }
-    .countdown-number {
-      background-color: #1e40af;
-      color: white;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-      font-size: 1.5rem;
-      min-width: 3.5rem;
-      text-align: center;
-    }
-    .countdown-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      color: #1e40af;
-      font-weight: 600;
-    }
-    .file-list {
-      max-height: 200px;
-      overflow-y: auto;
+    .shadow-subtle {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
-<body>
+<body class="bg-[#121212] text-white font-sans">
   <div class="min-h-screen flex flex-col">
+
     <!-- Header -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-indigo-600">Blockchain Time Capsule</h1>
-        <button id="connectWalletBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-          Connect Wallet
-        </button>
+    <header class="flex justify-between items-center px-6 py-4">
+      <div class="flex items-center space-x-2">
+        <img src="logo.png" alt="Kapsule logo" class="w-6" />
+        <span class="text-xl font-semibold">Kapsule</span>
       </div>
+      <button id="connectWalletBtn" class="bg-[#00E0B8] text-black py-3 px-6 rounded-full font-semibold hover:bg-[#00C2A0] transition">
+        Connect Wallet
+      </button>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-8">
-      <!-- Create Capsule Section -->
-      <div id="createSection" class="time-capsule-container rounded-xl shadow-md p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Create a New Time Capsule</h2>
-        
-        <div class="mb-4">
-          <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Your Message (max 200 characters)</label>
-          <textarea id="message" maxlength="200" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Write a message to your future self..." rows="3"></textarea>
-          <div class="text-xs text-right text-gray-500 mt-1">
-            <span id="charCount">0</span>/200 characters
-          </div>
+<main class="flex-grow max-w-3xl mx-auto w-full px-4 py-8">
+  <!-- Create Capsule Section -->
+  <div id="createSection" class="bg-[#1F1F1F] rounded-2xl shadow-subtle p-6 mb-10">
+    <h2 class="text-2xl font-semibold text-white mb-6">Create a New Time Capsule</h2>
+    
+    <!-- Message Input -->
+    <div class="mb-6">
+      <label for="message" class="block text-sm font-medium text-white mb-2">Your Message</label>
+      <textarea id="message" maxlength="200" class="w-full p-4 rounded-xl bg-[#2A2A2A] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00E0B8]" placeholder="Write a message for the future..." rows="4"></textarea>
+      <div class="text-xs text-right text-gray-400 mt-1"><span id="charCount">0</span>/200 characters</div>
+    </div>
+
+    <!-- Date Picker -->
+    <div class="mb-6">
+      <label for="releaseDate" class="block text-sm font-medium text-white mb-2">Release Date</label>
+      <input type="text" id="releaseDate" class="w-full p-4 rounded-xl bg-[#2A2A2A] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00E0B8]" placeholder="Select a future date...">
+    </div>
+
+    <!-- File Upload -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-white mb-2">Upload Files</label>
+      <label for="fileUpload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-[#1A1A1A] hover:bg-[#222] transition">
+        <div class="flex flex-col items-center pt-4">
+          <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <p class="text-sm text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
         </div>
-        
-        <div class="mb-4">
-          <label for="releaseDate" class="block text-sm font-medium text-gray-700 mb-1">Release Date</label>
-          <input type="text" id="releaseDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Select a future date...">
+        <input id="fileUpload" type="file" class="hidden" multiple>
+      </label>
+      <div id="fileList" class="mt-4 text-sm text-gray-300 space-y-1 max-h-40 overflow-y-auto"></div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end">
+      <button id="createCapsuleBtn" class="bg-[#00C2FF] text-black py-3 px-6 rounded-full font-semibold hover:bg-[#00C2A0] transition">
+        Create Capsule
+      </button>
+    </div>
+  </div>
+
+  <!-- View Capsule Section -->
+  <div id="viewSection" class="bg-[#1F1F1F] rounded-2xl shadow-subtle p-6 mb-10 hidden">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-semibold text-white">Time Capsule</h2>
+      <div class="flex space-x-4 text-sm font-medium">
+        <button id="viewMyCapsules" class="text-[#00E0B8] hover:underline">My Capsules</button>
+        <button id="backToCreateBtn" class="text-[#00E0B8] hover:underline">← Create another capsule</button>
+      </div>
+    </div>
+
+    <p class="text-sm text-gray-400 mb-4">Capsule ID: <span id="capsuleIdDisplay" class="font-mono text-[#00E0B8]"></span></p>
+
+    <!-- Countdown -->
+    <div id="countdownContainer" class="bg-[#222] rounded-xl p-6 mb-6">
+      <h3 class="text-lg font-semibold text-center text-white mb-4">Time Until Unlock</h3>
+      <div class="grid grid-cols-4 gap-4">
+        <div class="flex flex-col items-center">
+          <div id="days" class="countdown-number">00</div>
+          <div class="countdown-label">Days</div>
         </div>
-        
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Upload Files</label>
-          <div class="flex items-center justify-center w-full">
-            <label for="fileUpload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-              <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg class="w-8 h-8 mb-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                <p class="text-xs text-gray-500">Upload any files to include in your time capsule</p>
-              </div>
-              <input id="fileUpload" type="file" class="hidden" multiple="">
-            </label>
-          </div>
-          
-          <div id="fileList" class="mt-4 file-list">
-            <!-- File list will be populated here -->
-          </div>
+        <div class="flex flex-col items-center">
+          <div id="hours" class="countdown-number">00</div>
+          <div class="countdown-label">Hours</div>
         </div>
-        
-        <div class="flex justify-end">
-          <button id="createCapsuleBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-            Create Time Capsule
-          </button>
+        <div class="flex flex-col items-center">
+          <div id="minutes" class="countdown-number">00</div>
+          <div class="countdown-label">Minutes</div>
+        </div>
+        <div class="flex flex-col items-center">
+          <div id="seconds" class="countdown-number">00</div>
+          <div class="countdown-label">Seconds</div>
         </div>
       </div>
-      
-      <!-- View Capsule Section -->
-      <div id="viewSection" class="time-capsule-container rounded-xl shadow-md p-6 mb-8 hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold">Time Capsule</h2>
-          <div class="flex space-x-4">
-            <button id="viewMyCapsules" class="text-indigo-600 hover:text-indigo-800">My Capsules</button>
-            <button id="backToCreateBtn" class="text-indigo-600 hover:text-indigo-800">← Create another capsule</button>
-          </div>
-        </div>
+    </div>
 
-        <p class="text-sm text-gray-500 mb-4">Capsule ID: <span id="capsuleIdDisplay" class="font-mono"></span></p>
-
-        <!-- Countdown Display -->
-        <div id="countdownContainer" class="countdown-container rounded-lg p-6 mb-6">
-          <h3 class="text-lg font-semibold text-center text-indigo-900 mb-4">Time Until Unlock</h3>
-          <div class="grid grid-cols-4 gap-4">
-            <div class="flex flex-col items-center">
-              <div id="days" class="countdown-number">00</div>
-              <div class="countdown-label">Days</div>
-            </div>
-            <div class="flex flex-col items-center">
-              <div id="hours" class="countdown-number">00</div>
-              <div class="countdown-label">Hours</div>
-            </div>
-            <div class="flex flex-col items-center">
-              <div id="minutes" class="countdown-number">00</div>
-              <div class="countdown-label">Minutes</div>
-            </div>
-            <div class="flex flex-col items-center">
-              <div id="seconds" class="countdown-number">00</div>
-              <div class="countdown-label">Seconds</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Capsule Content (Hidden until unlocked) -->
-        <div id="capsuleContent" class="hidden">
-          <div class="bg-white rounded-lg p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">Message</h3>
-            <p id="capsuleMessage" class="text-gray-700 whitespace-pre-wrap"></p>
-          </div>
-
-          <div class="bg-white rounded-lg p-6">
-            <h3 class="text-lg font-semibold mb-4">Files</h3>
-            <div id="capsuleFiles" class="space-y-3">
-              <!-- Files will be listed here -->
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-6 flex justify-end">
-          <button id="copyCapsuleLink" class="text-indigo-600 hover:text-indigo-800">
-            Copy Shareable Link
-          </button>
+    <!-- Message & Files -->
+    <div id="capsuleContent" class="hidden">
+      <div class="bg-[#2A2A2A] rounded-xl p-6 mb-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Message</h3>
+        <p id="capsuleMessage" class="whitespace-pre-wrap text-gray-300"></p>
+      </div>
+      <div class="bg-[#2A2A2A] rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Files</h3>
+        <div id="capsuleFiles" class="space-y-2 text-gray-300">
+          <!-- Files will be listed here -->
         </div>
       </div>
+    </div>
 
-      <!-- My Capsules List Section -->
-      <div id="myCapsulesList" class="time-capsule-container rounded-xl shadow-md p-6 mb-8 hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold">My Time Capsules</h2>
-          <button id="backFromListBtn" class="text-indigo-600 hover:text-indigo-800">← Back</button>
-        </div>
-        <div id="capsulesList" class="space-y-4">
-          <!-- Capsules will be listed here -->
-        </div>
+    <!-- Copy Link -->
+    <div class="mt-6 flex justify-end">
+      <button id="copyCapsuleLink" class="text-[#00E0B8] hover:underline text-sm font-medium">
+        Copy Shareable Link
+      </button>
+    </div>
+  </div>
+
+  <!-- My Capsules List -->
+  <div id="myCapsulesList" class="bg-[#1F1F1F] rounded-2xl shadow-subtle p-6 mb-10 hidden">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-semibold text-white">My Time Capsules</h2>
+      <button id="backFromListBtn" class="text-[#00E0B8] hover:underline text-sm font-medium">← Back</button>
+    </div>
+    <div id="capsulesList" class="space-y-4 text-white">
+      <!-- Capsules will be listed here -->
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+    <footer class="py-10 text-center text-[#BBBBBB] text-sm">
+      <div class="space-x-4 mb-2">
+        <a href="mailto:hello@jakekemsley.com" class="hover:underline">Contact</a>
+        <a href="https://arweave.org/" class="hover:underline">Arweave</a>
+        <a href="https://github.com/jakepeg/arweave-capsule" class="hover:underline">GitHub</a>
       </div>
-    </main>
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 py-4">
-      <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
-        <p class="text-sm text-gray-600">
-          Built with <a href="https://cookbook_ao.arweave.net/" class="text-indigo-600 hover:underline" target="_blank">AO</a> and <a href="https://www.arweave.org/" class="text-indigo-600 hover:underline" target="_blank">Arweave</a>
-        </p>
-        <a href="https://v3i4cnpp7gr3ruxco76b6qhvhor5jmvp2ru57s65htm673wwx2ha.arweave.net/rtHBNe_5o7jS4nf8H0D1O6PUsq_Uad_L3TzZ7-7Wvo4" class="text-sm text-indigo-600 hover:underline" target="_blank">
-          Original Inspiration
-        </a>
-      </div>
+      &copy; 2025 Kapsule. All rights reserved.
     </footer>
-  </div>
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-      <div class="flex items-center justify-center mb-4">
-        <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-      </div>
-      <p id="loadingText" class="text-center text-gray-700">Processing your time capsule...</p>
-    </div>
-  </div>
+</div> <!-- closes outermost wrapper -->
 
-  <!-- Error Message -->
-  <div id="errorMessage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-      <div class="flex items-center justify-center mb-4 text-red-500">
-        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-      </div>
-      <p id="errorText" class="text-center text-gray-700 mb-4">An error occurred.</p>
-      <div class="flex justify-center">
-        <button id="errorCloseBtn" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-          Close
-        </button>
-      </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+  <div class="bg-[#1F1F1F] text-white p-6 rounded-xl shadow-lg max-w-md w-full text-center">
+    <div class="flex justify-center mb-4">
+      <svg class="animate-spin h-8 w-8 text-[#00E0B8]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
     </div>
+    <p id="loadingText" class="text-gray-300">Processing your time capsule...</p>
   </div>
+</div>
+
+<!-- Error Message -->
+<div id="errorMessage" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+  <div class="bg-[#2A2A2A] text-white p-6 rounded-xl shadow-lg max-w-md w-full text-center">
+    <div class="flex justify-center mb-4 text-red-500">
+      <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <p id="errorText" class="text-gray-300 mb-4">An error occurred.</p>
+    <button id="errorCloseBtn"
+            class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-full transition">
+      Close
+    </button>
+  </div>
+</div>
+
 
   <script type="module">
     // Import required libraries
